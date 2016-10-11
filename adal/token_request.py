@@ -167,13 +167,14 @@ class TokenRequest(object):
 
         return oauth_parameters
 
-    def _get_token_username_password_managed(self, username, password):
+    def _get_token_username_password_managed(self, username, password, client_secret):
         self._log.debug('Acquiring token with username password for managed user')
 
         oauth_parameters = self._create_oauth_parameters(OAUTH2_GRANT_TYPE.PASSWORD)
 
         oauth_parameters[OAUTH2_PARAMETERS.PASSWORD] = password
         oauth_parameters[OAUTH2_PARAMETERS.USERNAME] = username
+        oauth_parameters[OAUTH2_PARAMETERS.CLIENT_SECRET] = client_secret
 
         return self._oauth_get_token(oauth_parameters)
 
@@ -262,7 +263,7 @@ class TokenRequest(object):
 
         return WSTrustVersion.UNDEFINED
 
-    def get_token_with_username_password(self, username, password):
+    def get_token_with_username_password(self, username, password, client_secret):
         self._log.info("Acquiring token with username password.")
         self._user_id = username
         try:
@@ -281,7 +282,7 @@ class TokenRequest(object):
 
             try:
                 if self._user_realm.account_type == ACCOUNT_TYPE['Managed']:
-                    token = self._get_token_username_password_managed(username, password)
+                    token = self._get_token_username_password_managed(username, password, client_secret)
                 elif self._user_realm.account_type == ACCOUNT_TYPE['Federated']:
                     token = self._get_token_username_password_federated(username, password)
                 else:
@@ -293,7 +294,7 @@ class TokenRequest(object):
                 raise
         else:
             self._log.info('Skipping user realm discovery for ADFS authority')
-            token = self._get_token_username_password_managed(username, password)
+            token = self._get_token_username_password_managed(username, password, client_secret)
        
         self._cache_driver.add(token)
         return token
