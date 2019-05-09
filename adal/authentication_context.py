@@ -144,7 +144,7 @@ class AuthenticationContext(object):
 
         return self._acquire_token(token_func)       
 
-    def acquire_token_with_username_password(self, resource, username, password, client_id):
+    def acquire_token_with_username_password(self, resource, username, password, client_id, client_secret):
         '''Gets a token for a given resource via user credentails.
         
         :param str resource: A URI that identifies the resource for which the 
@@ -154,12 +154,14 @@ class AuthenticationContext(object):
         :param str password: The password of the user named in the username
             parameter.
         :param str client_id: The OAuth client id of the calling application.
+        :param str client_secret: The OAuth client secret of the calling application.
+
         :returns: dict with several keys, include "accessToken" and
             "refreshToken".
         '''
         def token_func(self):
             token_request = TokenRequest(self._call_context, self, client_id, resource)
-            return token_request.get_token_with_username_password(username, password)
+            return token_request.get_token_with_username_password(username, password, client_secret)
 
         return self._acquire_token(token_func)
 
